@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.vojjalateja.symphonia"
+    android:installLocation="preferExternal">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/musicsearch"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme"
+        >
+        <activity
+            android:name="com.example.vojjalateja.symphonia.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Base.Theme.AppCompat.Light.DarkActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service android:name="com.example.vojjalateja.symphonia.MusicService" />
+        <activity android:name=".DownloadActivity"/>
+        <activity android:name=".searchactivity"/>
+        <activity android:name=".Movie"/>
+        <activity android:name=".prefsactivity"
+            android:theme="@style/Base.ThemeOverlay.AppCompat.Dark"/>
+        <activity
+            android:name=".MusicPlayer"/>
+    </application>
+
+</manifest>

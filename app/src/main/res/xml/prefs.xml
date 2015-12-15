@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<ListPreference
+    android:title="Format"
+    android:key="list"
+    android:summary="Select a default format"
+    android:entries="@array/list"
+    android:entryValues="@array/lvalues"
+    ></ListPreference>
+</PreferenceScreen>
