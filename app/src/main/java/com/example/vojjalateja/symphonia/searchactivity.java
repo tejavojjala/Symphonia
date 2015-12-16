@@ -177,7 +177,8 @@ public class searchactivity extends AppCompatActivity{
                                 Elements linkitems=document.select("div.link-item");
                                 for(org.jsoup.nodes.Element linkitem:linkitems)
                                 {
-                                    if(linkitem.select("div.link").text().equals(song.Name)){
+                                    String temp=linkitem.select("div.link").text();
+                                    if(temp.contains(song.Name)||song.Name.contains(temp)){
                                         Elements all_a=linkitem.select("a");
                                         downloadlink=all_a.get(0).attr("href");
                                         downloadlink=downloadlink.substring(10);
