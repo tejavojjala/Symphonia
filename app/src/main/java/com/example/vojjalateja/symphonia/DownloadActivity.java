@@ -40,6 +40,7 @@ public class DownloadActivity extends Activity {
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI
                 | DownloadManager.Request.NETWORK_MOBILE);
         myDownloadReference = downloadManager.enqueue(request);
+        Toast.makeText(context,Song_Name+" is enqued to downloads",Toast.LENGTH_LONG).show();
         receiverDownloadComplete=new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
