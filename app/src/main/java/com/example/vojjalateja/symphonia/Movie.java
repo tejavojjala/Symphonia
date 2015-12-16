@@ -197,7 +197,7 @@ public class Movie extends AppCompatActivity{
                     if(et.contentEquals("2"))
                         format="0";
                     else
-                        format="120";
+                        format="128";
                     result = "http://dl.songsmp3.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
                     downloadintent.putExtra("downloadurl", result);
                     downloadintent.putExtra("songname", songs.get(position).Name);
