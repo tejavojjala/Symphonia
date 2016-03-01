@@ -51,12 +51,19 @@ public class downloads extends Fragment{
         list= file.listFiles();
         for( int i=0;i<list.length; i++)
         {
-            FirstList flis=new FirstList();
-            flis.SongLink=list[i].getPath();
-            metadataRetriever.setDataSource(flis.SongLink);
-            art.add(metadataRetriever.getEmbeddedPicture());
-            flis.Name=list[i].getName().substring(0,list[i].getName().length()-4);
-            flist.add(flis);
+            try
+            {
+                FirstList flis=new FirstList();
+                flis.SongLink=list[i].getPath();
+                metadataRetriever.setDataSource(flis.SongLink);
+                art.add(metadataRetriever.getEmbeddedPicture());
+                flis.Name=list[i].getName().substring(0,list[i].getName().length()-4);
+                flist.add(flis);
+            }
+            catch
+            {
+                ;
+            }
         }
         MainActivity.numberoffiles=list.length;
     }
