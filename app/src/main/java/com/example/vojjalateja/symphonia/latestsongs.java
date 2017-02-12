@@ -133,7 +133,7 @@ public class latestsongs extends Fragment{
             FirstList song=songs.get(i);
             songViewHolder.Name.setText(song.Name);
             Log.d("image",song.ImageLink);
-            Picasso.with(context).load(song.ImageLink).placeholder(R.drawable.loading).error(R.drawable.loading).into(songViewHolder.songPhoto);
+            Picasso.with(context).load(song.ImageLink).fit().centerCrop().placeholder(R.drawable.loading).error(R.drawable.loading).into(songViewHolder.songPhoto);
         }
 
         @Override

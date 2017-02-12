@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
@@ -16,6 +17,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -23,8 +27,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,9 +46,11 @@ public class MainActivity extends AppCompatActivity {
     Context context;
     private MenuItem mSearchAction;
     private boolean isSearchOpened = false;
-    private EditText edtSeach;
+    private AutoCompleteTextView edtSeach;
     private BroadcastReceiver deletereceiver;
     public static int numberoffiles,firsttime,intenrnetConnection;
+    private SearchSuggestions searchSuggestions;
+    private ArrayAdapter<String> suggestionsAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
             mSearchAction.setVisible(false);
             action.setCustomView(R.layout.search_bar);
             action.setDisplayShowTitleEnabled(false);
-            edtSeach = (EditText)action.getCustomView().findViewById(R.id.edtSearch);
+            edtSeach = (AutoCompleteTextView) action.getCustomView().findViewById(R.id.edtSearch);
             edtSeach.setHint("Enter a movie/song name");
             edtSeach.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
@@ -208,6 +218,30 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             edtSeach.requestFocus();
+            suggestionsAdapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,new ArrayList<String>());
+            edtSeach.setAdapter(suggestionsAdapter);
+            edtSeach.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    String query = s.toString().trim().replaceAll("\\s","+");
+                    if(searchSuggestions!=null) {
+                        searchSuggestions.cancel(true);
+                        searchSuggestions = null;
+                    }
+                    searchSuggestions = new SearchSuggestions();
+                    searchSuggestions.execute(query);
+                }
+            });
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(edtSeach, InputMethodManager.SHOW_IMPLICIT);
             isSearchOpened = true;
@@ -226,5 +260,46 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         super.onBackPressed();
+    }
+
+    private class SearchSuggestions extends AsyncTask<String,Void,List<String> >{
+
+        @Override
+        protected List<String> doInBackground(String... params) {
+            String query = params[0];
+            Document document = null;
+            List<String> suggestions = new ArrayList<>();
+            try{
+                document = Jsoup.connect("http://smp3dl.com/category/instant?q="+query).get();
+                String[] result = document.select("body").get(0).text().split("name=");
+                for(int i=1;i<result.length;i=i+2){
+                    String st="";
+                    for(int j=0;j<result[i].length();j++)
+                    {
+                        if(result[i].charAt(j)=='%'||result[i].charAt(j)=='%')
+                            break;
+                        if(result[i].charAt(j)=='+')
+                            st=st+' ';
+                        else
+                            st=st+result[i].charAt(j);
+                    }
+                    suggestions.add(st);
+                    Log.d("Pattern "+i,st);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return suggestions;
+        }
+
+        @Override
+        protected void onPostExecute(List<String> suggestions) {
+            super.onPostExecute(suggestions);
+            if(edtSeach!=null && suggestionsAdapter!=null) {
+                suggestionsAdapter.clear();
+                suggestionsAdapter.addAll(suggestions);
+                suggestionsAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }
