@@ -37,6 +37,8 @@ public class searchactivity extends AppCompatActivity{
     ConnectionDetector connectionDetector;
     Context context;
     private ProgressDialog pd;
+    ArrayList<FirstList> flist;
+    private int imagesSearched=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +70,7 @@ public class searchactivity extends AppCompatActivity{
 
         @Override
         protected ArrayList<FirstList> doInBackground(Void... params) {
-            ArrayList<FirstList> flist=new ArrayList<FirstList>();
+            flist=new ArrayList<>();
             try {
                 Document document= Jsoup.connect(searchUrl).timeout(10000).get();
                 Elements srls=document.select("div.search_results_list");
@@ -80,10 +82,9 @@ public class searchactivity extends AppCompatActivity{
                     fl.Name=li.get(0).text().substring(7);
                     fl.SongLink=fl.SongLink+srl.select("div.slcol").select("a").attr("href");
                     fl.Type=li.get(1).text().substring(7);
-                    fl.ImageLink =fl.ImageLink+Jsoup.connect(fl.SongLink).timeout(10000).get().select("div.movie_cover").select("img").attr("src");
-                    fl.ImageLink = fl.ImageLink.replaceAll("\\s","%20");
                     flist.add(fl);
                 }
+                /*
                 Elements li2=document.select("li.page");
                 //Change this if u want more search results
                 int pages=Math.min(2, li2.size());
@@ -105,8 +106,8 @@ public class searchactivity extends AppCompatActivity{
                         fl.ImageLink = fl.ImageLink.replaceAll("\\s","%20");
                         flist.add(fl);
                     }
-
                 }
+                */
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -124,11 +125,35 @@ public class searchactivity extends AppCompatActivity{
                 Toast.makeText(context,"No results found",Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
-            String temp="";
-            for(int i=0;i<flist.size();i++)
+            imagesSearched=0;
+            for(int i = 0; i<flist.size(); i++)
             {
-                temp=temp+flist.get(i).Name+"\n"+flist.get(i).Type+"\n";
+                new ImageResults().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,i);
             }
+
+        }
+    }
+
+    private class ImageResults extends AsyncTask<Integer,Void,String>{
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            int index = params[0];
+            try {
+                flist.get(index).ImageLink = flist.get(index).ImageLink + Jsoup.connect(flist.get(index).SongLink).timeout(10000).get().select("div.movie_cover").select("img").attr("src");
+                flist.get(index).ImageLink = flist.get(index).ImageLink.replaceAll("\\s", "%20");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            imagesSearched++;
+            if(imagesSearched != flist.size())
+                return;
             RVAdapter adapter = new RVAdapter(flist);
             RecyclerView rv = (RecyclerView)findViewById(R.id.rv2);
             StaggeredGridLayoutManager sglm=new StaggeredGridLayoutManager(2,1);
@@ -137,6 +162,7 @@ public class searchactivity extends AppCompatActivity{
             rv.setAdapter(adapter);
         }
     }
+
     public class RVAdapter extends RecyclerView.Adapter<RVAdapter.SongViewHolder>{
 
         ArrayList<FirstList> songs;

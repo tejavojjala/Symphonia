@@ -173,8 +173,13 @@ public class downloads extends Fragment{
             FirstList song=songs.get(i);
             byte[] ar=art.get(i);
             songViewHolder.Name.setText(song.Name);
-            Bitmap bm=BitmapFactory.decodeByteArray(ar,0,ar.length);
-            songViewHolder.songPhoto.setImageBitmap(bm);
+            if(null != art) {
+                Bitmap bm = BitmapFactory.decodeByteArray(ar, 0, ar.length);
+                songViewHolder.songPhoto.setImageBitmap(bm);
+            }
+            else{
+                songViewHolder.songPhoto.setImageDrawable(getResources().getDrawable(R.drawable.musicsearch));
+            }
         }
         @Override
         public int getItemCount() {
