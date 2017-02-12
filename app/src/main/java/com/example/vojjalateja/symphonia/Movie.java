@@ -15,6 +15,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,7 +105,7 @@ public class Movie extends AppCompatActivity{
             int pages=li.size();
             for(int page=1;page<pages;page++){
                 try {
-                    searchUrl="http://www.songsmp3.com"+li.get(page).select("a").attr("href");
+                    searchUrl="http://www.songsmp3.co"+li.get(page).select("a").attr("href");
                     document= Jsoup.connect(searchUrl).timeout(10000).get();
                     Elements srls=document.select("div.link-item");
                     for(org.jsoup.nodes.Element srl:srls)
@@ -183,7 +184,8 @@ public class Movie extends AppCompatActivity{
                                     format = "128";
                                 else
                                     format = "0";
-                                result = "http://dl.songsmp3.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
+                                result = "http://dl.smp3dl.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
+                                Log.d("Movie",result);
                                 downloadintent.putExtra("downloadurl", result);
                                 downloadintent.putExtra("songname", songs.get(position).Name);
                                 startActivity(downloadintent);
@@ -198,7 +200,7 @@ public class Movie extends AppCompatActivity{
                         format="0";
                     else
                         format="128";
-                    result = "http://dl.songsmp3.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
+                    result = "http://dl.smp3dl.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
                     downloadintent.putExtra("downloadurl", result);
                     downloadintent.putExtra("songname", songs.get(position).Name);
                     startActivity(downloadintent);

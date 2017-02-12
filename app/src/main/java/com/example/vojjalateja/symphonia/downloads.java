@@ -60,9 +60,9 @@ public class downloads extends Fragment{
                 flis.Name=list[i].getName().substring(0,list[i].getName().length()-4);
                 flist.add(flis);
             }
-            catch
+            catch(Exception e)
             {
-                ;
+                e.printStackTrace();
             }
         }
         MainActivity.numberoffiles=list.length;

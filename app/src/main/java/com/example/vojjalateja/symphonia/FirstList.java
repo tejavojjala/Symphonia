@@ -8,7 +8,7 @@ public class FirstList {
     FirstList()
     {
         this.Name="";this.Type="";
-        this.ImageLink ="http://www.songsmp3.com";
-        this.SongLink="http://www.songsmp3.com";
+        this.ImageLink ="http://smp3dl.com";
+        this.SongLink="http://smp3dl.com";
     }
 }

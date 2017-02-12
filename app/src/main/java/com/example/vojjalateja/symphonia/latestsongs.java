@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,13 +44,14 @@ public class latestsongs extends Fragment{
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
-                        Document document = Jsoup.connect("http://www.songsmp3.com").timeout(10000).get();
+                        Document document = Jsoup.connect("http://www.songsmp3.co").timeout(10000).get();
                         Elements li = document.select("div.image_box").select("li");
                         Element l;
                         for (int i = 0; i < li.size(); i++) {
                             l = li.get(i);
                             FirstList flis = new FirstList();
                             flis.ImageLink = flis.ImageLink + l.select("img").attr("src");
+                            flis.ImageLink = flis.ImageLink.replaceAll("\\s","%20");
                             flis.Name = l.select("img").attr("alt");
                             flis.SongLink = flis.SongLink + l.select("a").attr("href");
                             flist.add(flis);
@@ -130,6 +132,7 @@ public class latestsongs extends Fragment{
         public void onBindViewHolder(SongViewHolder songViewHolder, int i) {
             FirstList song=songs.get(i);
             songViewHolder.Name.setText(song.Name);
+            Log.d("image",song.ImageLink);
             Picasso.with(context).load(song.ImageLink).placeholder(R.drawable.loading).error(R.drawable.loading).into(songViewHolder.songPhoto);
         }
 

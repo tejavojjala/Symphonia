@@ -43,7 +43,7 @@ public class searchactivity extends AppCompatActivity{
         setContentView(R.layout.recyclerviewlayout2);
         context=this;
         searchedFor=getIntent().getExtras().getString("searchedfor");
-        searchUrl="http://www.songsmp3.com/category/search?search="+searchedFor;
+        searchUrl="http://www.songsmp3.co/category/search?search="+searchedFor;
         connectionDetector=new ConnectionDetector(context);
         if(connectionDetector.isConnectingToInternet())
         {
@@ -81,6 +81,7 @@ public class searchactivity extends AppCompatActivity{
                     fl.SongLink=fl.SongLink+srl.select("div.slcol").select("a").attr("href");
                     fl.Type=li.get(1).text().substring(7);
                     fl.ImageLink =fl.ImageLink+Jsoup.connect(fl.SongLink).timeout(10000).get().select("div.movie_cover").select("img").attr("src");
+                    fl.ImageLink = fl.ImageLink.replaceAll("\\s","%20");
                     flist.add(fl);
                 }
                 Elements li2=document.select("li.page");
@@ -101,6 +102,7 @@ public class searchactivity extends AppCompatActivity{
                         fl.SongLink=fl.SongLink+srl.select("div.slcol").select("a").attr("href");
                         fl.Type=li.get(1).text().substring(7);
                         fl.ImageLink =fl.ImageLink+Jsoup.connect(fl.SongLink).timeout(10000).get().select("div.movie_cover").select("img").attr("src");
+                        fl.ImageLink = fl.ImageLink.replaceAll("\\s","%20");
                         flist.add(fl);
                     }
 
@@ -177,7 +179,7 @@ public class searchactivity extends AppCompatActivity{
                                 Elements linkitems=document.select("div.link-item");
                                 for(org.jsoup.nodes.Element linkitem:linkitems)
                                 {
-                                    String temp=linkitem.select("div.link").text();
+                                    String temp=linkitem.select("div.link").text().trim();
                                     if(temp.contains(song.Name)||song.Name.contains(temp)){
                                         Elements all_a=linkitem.select("a");
                                         downloadlink=all_a.get(0).attr("href");
@@ -222,8 +224,7 @@ public class searchactivity extends AppCompatActivity{
                                                 format = "128";
                                             else
                                                 format = "0";
-                                            result2 = "http://dl.songsmp3.com/fileDownload/Songs/" + format + "/" + result2 + ".mp3";
-                                            downloadintent.putExtra("downloadurl", result2);
+                                            result2 = "http://dl.smp3dl.com/fileDownload/Songs/" + format + "/" + result2 + ".mp3";                                            downloadintent.putExtra("downloadurl", result2);
                                             downloadintent.putExtra("songname", songs.get(position).Name);
                                             startActivity(downloadintent);
                                         }
@@ -237,7 +238,7 @@ public class searchactivity extends AppCompatActivity{
                                     format="0";
                                 else
                                     format="128";
-                                result2 = "http://dl.songsmp3.com/fileDownload/Songs/" + format + "/" + result2 + ".mp3";
+                                result2 = "http://dl.smp3dl.com/fileDownload/Songs/" + format + "/" + result2 + ".mp3";
                                 downloadintent.putExtra("downloadurl", result2);
                                 downloadintent.putExtra("songname", songs.get(position).Name);
                                 startActivity(downloadintent);

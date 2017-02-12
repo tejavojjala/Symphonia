@@ -63,4 +63,13 @@ public class Utilities {
         // return current duration in milliseconds
         return currentDuration * 1000;
     }
+
+    public static String getConvertedLink(String format, String id, String name)
+    {
+        if(format.equals("0"))
+            return "http://dl.smp3dl.com/files/convert/"+id+"/"+format+"/"+name.replaceAll("\\s","%20")+"%20(SongsMp3.Com).mp3";
+        else
+            return "http://dl.smp3dl.com/files/convert/"+id+"/"+format+"/"+name.replaceAll("\\s","%20")+".mp3";
+    }
+
 }
