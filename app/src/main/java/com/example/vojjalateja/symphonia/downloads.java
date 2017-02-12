@@ -173,7 +173,7 @@ public class downloads extends Fragment{
             FirstList song=songs.get(i);
             byte[] ar=art.get(i);
             songViewHolder.Name.setText(song.Name);
-            if(null != art) {
+            if(null != ar) {
                 Bitmap bm = BitmapFactory.decodeByteArray(ar, 0, ar.length);
                 songViewHolder.songPhoto.setImageBitmap(bm);
             }

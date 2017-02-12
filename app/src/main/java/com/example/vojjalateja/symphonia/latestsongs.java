@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -31,6 +32,8 @@ public class latestsongs extends Fragment{
 
     Context context;
     static List<FirstList> flist;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    ConnectionDetector connectionDetector;
     public latestsongs() {
     }
     @Override
@@ -39,46 +42,34 @@ public class latestsongs extends Fragment{
         context=getActivity();
         if(MainActivity.firsttime==0) {
             flist = new ArrayList<>();
-            ConnectionDetector connectionDetector = new ConnectionDetector(getActivity());
-            AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    try {
-                        Document document = Jsoup.connect("http://www.songsmp3.co").timeout(10000).get();
-                        Elements li = document.select("div.image_box").select("li");
-                        Element l;
-                        for (int i = 0; i < li.size(); i++) {
-                            l = li.get(i);
-                            FirstList flis = new FirstList();
-                            flis.ImageLink = flis.ImageLink + l.select("img").attr("src");
-                            flis.ImageLink = flis.ImageLink.replaceAll("\\s","%20");
-                            flis.Name = l.select("img").attr("alt");
-                            flis.SongLink = flis.SongLink + l.select("a").attr("href");
-                            flist.add(flis);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    super.onPostExecute(aVoid);
-                    Intent intent=new Intent();
-                    intent.setAction("com.vojjalateja.deleteaction");
-                    getActivity().sendBroadcast(intent);
-                }
-            };
+            connectionDetector = new ConnectionDetector(getActivity());
+            LatestSongsAsync latestSongsAsync = new LatestSongsAsync();
             if (connectionDetector.isConnectingToInternet())
-                task.execute();
+                latestSongsAsync.execute();
+            else
+                Toast.makeText(context,"No Internet",Toast.LENGTH_LONG).show();
         }
         context=getActivity();
     }
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.staggeredrecyclerview, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout)view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                LatestSongsAsync latestSongsAsync = new LatestSongsAsync();
+                if(null == connectionDetector)
+                    connectionDetector = new ConnectionDetector(context);
+                if (connectionDetector.isConnectingToInternet())
+                    latestSongsAsync.execute();
+                else {
+                    Toast.makeText(context,"No Internet",Toast.LENGTH_LONG).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
         RVAdapter2 adapter = new RVAdapter2(flist);
         RecyclerView rv = (RecyclerView)view.findViewById(R.id.staggered_recycler_view);
         StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(1,1);
@@ -145,4 +136,40 @@ public class latestsongs extends Fragment{
             super.onAttachedToRecyclerView(recyclerView);
         }
     }
+
+    private class LatestSongsAsync extends AsyncTask<Void,Void,Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                flist.clear();
+                Document document = Jsoup.connect("http://www.songsmp3.co").timeout(10000).get();
+                Elements li = document.select("div.image_box").select("li");
+                Element l;
+                for (int i = 0; i < li.size(); i++) {
+                    l = li.get(i);
+                    FirstList flis = new FirstList();
+                    flis.ImageLink = flis.ImageLink + l.select("img").attr("src");
+                    flis.ImageLink = flis.ImageLink.replaceAll("\\s","%20");
+                    flis.Name = l.select("img").attr("alt");
+                    flis.SongLink = flis.SongLink + l.select("a").attr("href");
+                    flist.add(flis);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            swipeRefreshLayout.setRefreshing(false);
+            Intent intent=new Intent();
+            intent.setAction("com.vojjalateja.deleteaction");
+            getActivity().sendBroadcast(intent);
+        }
+
+    }
+
+
 }
