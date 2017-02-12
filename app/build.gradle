@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '24.0.3'
 
     defaultConfig {
         applicationId "com.example.vojjalateja.symphonia"
@@ -26,6 +26,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.0.+'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:design:23.1.1'
-    compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.2'
     compile files('libs/jsoup-1.8.3.jar')
 }
