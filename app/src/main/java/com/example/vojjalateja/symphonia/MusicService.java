@@ -10,6 +10,9 @@ import android.os.PowerManager;
 
 import java.util.ArrayList;
 
+import static com.example.vojjalateja.symphonia.MusicPlayer.currentSongIndex;
+import static com.example.vojjalateja.symphonia.MusicPlayer.songsList;
+
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,MediaPlayer.OnCompletionListener {
     private final IBinder musicBind = new MusicBinder();
     private MediaPlayer player;
@@ -27,8 +30,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void setSong(int songIndex){
         songPosn=songIndex;
     }
-    public void playSong() {
+
+    public void playSong(int songIndex) {
         try {
+            setSong(songIndex);
             player.reset();
             player.setDataSource(songs.get(songPosn).SongLink);
             player.prepare();
@@ -63,6 +68,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
     @Override
     public void onCompletion(MediaPlayer mp) {
+        if(currentSongIndex < (songsList.size() - 1)){
+            playSong(currentSongIndex + 1);
+            currentSongIndex = currentSongIndex + 1;
+        }
+        else{
+            playSong(0);
+            currentSongIndex = 0;
+        }
+
         Intent intent=new Intent();
         intent.setAction("com.vojjalateja.complete");
         sendBroadcast(intent);

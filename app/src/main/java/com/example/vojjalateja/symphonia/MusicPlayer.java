@@ -34,16 +34,18 @@ public class MusicPlayer extends Activity implements SeekBar.OnSeekBarChangeList
     private Handler mHandler = new Handler();
     private SongsManager songManager=null;
     private Utilities utils;
-    private int currentSongIndex = 0;
+    public static int currentSongIndex = 0;
     Typeface font;
     private MusicService musicSrv;
     private Intent playIntent;
     private boolean musicBound=false;
     private BroadcastReceiver completereceiver;
-    private ArrayList<FirstList> songsList = new ArrayList<FirstList>();
+    public static ArrayList<FirstList> songsList = new ArrayList<FirstList>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentSongIndex = 0;
+        songsList.clear();
         setContentView(R.layout.player2);
         font = Typeface.createFromAsset(this.getAssets(),"fontawesome-webfont.ttf");
         songImage = (ImageView) findViewById(R.id.playingsong);
@@ -111,7 +113,7 @@ public class MusicPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         completereceiver=new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                onComplet();
+                updateUI(currentSongIndex);
             }
         };
     }
@@ -119,6 +121,7 @@ public class MusicPlayer extends Activity implements SeekBar.OnSeekBarChangeList
     @Override
     protected void onResume() {
         super.onResume();
+        updateUI(currentSongIndex);
         IntentFilter intent=new IntentFilter();
         intent.addAction("com.vojjalateja.complete");
         registerReceiver(completereceiver,intent);
@@ -156,20 +159,26 @@ public class MusicPlayer extends Activity implements SeekBar.OnSeekBarChangeList
     }
     public void  playSong(int songIndex){
         try {
-            musicSrv.setSong(songIndex);
-            musicSrv.playSong();
-            String songTitle = songsList.get(songIndex).Name;
-            songTitleLabel.setText(songTitle);
-            metadataRetriever.setDataSource(songsList.get(songIndex).SongLink);
-            byte []ar=metadataRetriever.getEmbeddedPicture();
-            songImage.setImageBitmap(BitmapFactory.decodeByteArray(ar, 0, ar.length));
-            btnPlay.setText("\uf28c");
-            songProgressBar.setProgress(0);
-            songProgressBar.setMax(100);
-            updateProgressBar();
+            musicSrv.playSong(songIndex);
+            updateUI(songIndex);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public void updateUI(int songIndex){
+        String songTitle = songsList.get(songIndex).Name;
+        songTitleLabel.setText(songTitle);
+        metadataRetriever.setDataSource(songsList.get(songIndex).SongLink);
+        byte []ar=metadataRetriever.getEmbeddedPicture();
+        if(null != ar) {
+            songImage.setImageBitmap(BitmapFactory.decodeByteArray(ar, 0, ar.length));
+        } else{
+            songImage.setImageDrawable(getResources().getDrawable(R.drawable.musicsearch));
+        }
+        btnPlay.setText("\uf28c");
+        songProgressBar.setProgress(0);
+        songProgressBar.setMax(100);
+        updateProgressBar();
     }
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
