@@ -6,5 +6,11 @@
     android:summary="Select a default format"
     android:entries="@array/list"
     android:entryValues="@array/lvalues"
-    ></ListPreference>
+    />
+    <Preference
+        android:selectable="false"
+        android:persistent="false"
+        android:title="DMCA"
+        android:summary="The app is displaying the content of songsmp3.co. For any copyright issues please contact the site maintainers."
+        />
 </PreferenceScreen>

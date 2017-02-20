@@ -180,6 +180,7 @@ public class MusicPlayer extends Activity implements SeekBar.OnSeekBarChangeList
         songProgressBar.setMax(100);
         updateProgressBar();
     }
+
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }

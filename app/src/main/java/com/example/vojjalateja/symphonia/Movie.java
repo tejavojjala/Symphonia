@@ -5,10 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -33,6 +39,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.graphics.Paint.ANTI_ALIAS_FLAG;
+
 public class Movie extends AppCompatActivity{
     String searchUrl,searchedFor;
     String imagelink;
@@ -41,6 +49,7 @@ public class Movie extends AppCompatActivity{
     Context context;
     CollapsingToolbarLayout collapsing_container;
     Toolbar toolbar;
+    FloatingActionButton fab;
     ImageView imageview;
     List<FirstList> flist=new ArrayList<FirstList>();
     private ProgressDialog pd;
@@ -50,6 +59,19 @@ public class Movie extends AppCompatActivity{
         setContentView(R.layout.recyclerviewlayout);
         toolbar = (Toolbar) findViewById(R.id.technique_four_toolbar);
         collapsing_container = (CollapsingToolbarLayout) findViewById(R.id.collapsing_container);
+        fab =(FloatingActionButton)findViewById(R.id.fab);
+        fab.setImageBitmap(textAsBitmap("\uf019",100));
+        fab.setBackgroundColor(Color.parseColor("#F04193"));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, getIntent().getExtras().getString("MOVIE")+" songs are enqued to downloads",Toast.LENGTH_LONG).show();
+                for(int i=0;i<flist.size();i++)
+                {
+                    new downloadAll().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,flist.get(i).SongLink, flist.get(i).Name);
+                }
+            }
+        });
         setSupportActionBar(toolbar);
         imageview=(ImageView)findViewById(R.id.imgToolbar);
         context=this;
@@ -66,6 +88,40 @@ public class Movie extends AppCompatActivity{
         Picasso.with(context).load(i.getExtras().getString("IMAGE")).placeholder(R.drawable.loading).error(R.drawable.loading).into(imageview);
         new searchResults().execute((Void[]) null);
     }
+
+    public Bitmap textAsBitmap(String text, float textSize) {
+        Paint paint = new Paint(ANTI_ALIAS_FLAG);
+        paint.setTypeface(Typeface.createFromAsset(this.getAssets(), "fontawesome-webfont.ttf"));
+        paint.setTextSize(textSize);
+        paint.setAntiAlias(false);
+        paint.setColor(Color.parseColor("#FFFFFF"));
+        paint.setTextAlign(Paint.Align.LEFT);
+        float baseline = -paint.ascent(); // ascent() is negative
+        int width = (int) (paint.measureText(text) + 0.5f); // round
+        int height = (int) (baseline + paint.descent() + 0.5f);
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        canvas.setDensity(32);
+        canvas.drawText(text, 0, baseline, paint);
+        return image;
+    }
+
+    private class downloadAll extends AsyncTask<String,Void,Void>{
+
+        @Override
+        protected Void doInBackground(String... params) {
+            downloadintent=new Intent(context,DownloadActivity.class);
+            format="128";
+            result=params[0];
+            result = "http://dl.smp3dl.com/fileDownload/Songs/" + format + "/" + result + ".mp3";
+            downloadintent.putExtra("downloadurl", result);
+            downloadintent.putExtra("songname", params[1]);
+            downloadintent.putExtra("showToast",0);
+            startActivity(downloadintent);
+            return null;
+        }
+    }
+
     private class searchResults extends AsyncTask<Void,Void,List<FirstList>>  {
         @Override
         protected void onPreExecute() {

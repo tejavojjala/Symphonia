@@ -47,7 +47,7 @@ public class latestsongs extends Fragment{
             if (connectionDetector.isConnectingToInternet())
                 latestSongsAsync.execute();
             else
-                Toast.makeText(context,"No Internet",Toast.LENGTH_LONG).show();
+                Toast.makeText(context,"No Internet. Swipe to Refresh",Toast.LENGTH_LONG).show();
         }
         context=getActivity();
     }
@@ -65,7 +65,7 @@ public class latestsongs extends Fragment{
                 if (connectionDetector.isConnectingToInternet())
                     latestSongsAsync.execute();
                 else {
-                    Toast.makeText(context,"No Internet",Toast.LENGTH_LONG).show();
+                    Toast.makeText(context,"No Internet. Swipe to Refresh",Toast.LENGTH_LONG).show();
                     swipeRefreshLayout.setRefreshing(false);
                 }
             }
@@ -108,7 +108,7 @@ public class latestsongs extends Fragment{
                     startActivity(movieintent);
                 }
                 else{
-                    Toast.makeText(context, "No Internet Connection", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "No Internet. Swipe to Refresh", Toast.LENGTH_LONG).show();
                 }
             }
         }

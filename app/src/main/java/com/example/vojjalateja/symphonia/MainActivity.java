@@ -1,18 +1,23 @@
 package com.example.vojjalateja.symphonia;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private AutoCompleteTextView edtSeach;
     private BroadcastReceiver deletereceiver;
     public static int numberoffiles,firsttime,intenrnetConnection;
+    private static final int PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE_RESULT = 100;
     private SearchSuggestions searchSuggestions;
     private ArrayAdapter<String> suggestionsAdapter;
     @Override
@@ -106,7 +112,29 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE_RESULT);
+        }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE_RESULT: {
+                if (!(grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) ) {
+                    finish();
+                }
+
+            }
+
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -234,10 +262,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void afterTextChanged(Editable s) {
                     String query = s.toString().trim().replaceAll("\\s","+");
-                    if(searchSuggestions!=null) {
+                    /*if(searchSuggestions!=null) {
                         searchSuggestions.cancel(true);
                         searchSuggestions = null;
-                    }
+                    }*/
                     searchSuggestions = new SearchSuggestions();
                     searchSuggestions.execute(query);
                 }
@@ -276,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
                     String st="";
                     for(int j=0;j<result[i].length();j++)
                     {
-                        if(result[i].charAt(j)=='%'||result[i].charAt(j)=='%')
+                        if(result[i].charAt(j)=='%'||result[i].charAt(j)=='&')
                             break;
                         if(result[i].charAt(j)=='+')
                             st=st+' ';

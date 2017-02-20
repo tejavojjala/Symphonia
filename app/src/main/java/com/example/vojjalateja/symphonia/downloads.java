@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,18 +24,21 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class downloads extends Fragment{
 
     private List<FirstList> flist;
+    private Map<FirstList,Boolean> fmap = new HashMap<>();
     File file;
     Context context;
     MediaMetadataRetriever metadataRetriever;
+    int retrieved=0;
     File list[];
     private List<byte []>art;
-    public downloads() {
-    }
+    RVAdapter3 adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -47,23 +51,23 @@ public class downloads extends Fragment{
         if (!file.exists()) {
             file.mkdirs();
         }
+        retrieved=0;
         metadataRetriever=new MediaMetadataRetriever();
         list= file.listFiles();
+        fmap.clear();
+
+        Log.d("downloads","Hello");
+        if(null == list)
+            return ;
         for( int i=0;i<list.length; i++)
         {
-            try
-            {
-                FirstList flis=new FirstList();
-                flis.SongLink=list[i].getPath();
-                metadataRetriever.setDataSource(flis.SongLink);
-                art.add(metadataRetriever.getEmbeddedPicture());
-                flis.Name=list[i].getName().substring(0,list[i].getName().length()-4);
-                flist.add(flis);
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-            }
+            Log.d("downloads",String.valueOf(i));
+            FirstList flis=new FirstList();
+            flis.SongLink=list[i].getPath();
+            metadataRetriever.setDataSource(flis.SongLink);
+            art.add(metadataRetriever.getEmbeddedPicture());
+            flis.Name=list[i].getName().substring(0,list[i].getName().length()-4);
+            flist.add(flis);
         }
         MainActivity.numberoffiles=list.length;
     }
@@ -72,7 +76,7 @@ public class downloads extends Fragment{
                              Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.recyclerviewlayout2, container, false);
         context=getActivity();
-        RVAdapter3 adapter = new RVAdapter3(flist);
+        adapter = new RVAdapter3(flist);
         RecyclerView rv = (RecyclerView)view.findViewById(R.id.rv2);
         StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2,1);
         rv.setLayoutManager(sglm);

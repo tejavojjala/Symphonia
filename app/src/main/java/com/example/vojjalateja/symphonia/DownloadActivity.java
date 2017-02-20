@@ -32,7 +32,10 @@ public class DownloadActivity extends Activity {
         if (!direct.exists()) {
             direct.mkdirs();
         }
-        Toast.makeText(context,Song_Name+" is enqued to downloads",Toast.LENGTH_LONG).show();
+        int showToast=getIntent().getExtras().getInt("showToast",1);
+        Song_Name=getIntent().getExtras().getString("songname");
+        if(showToast==1)
+            Toast.makeText(context,Song_Name+" is enqued to downloads",Toast.LENGTH_LONG).show();
         new DownloadAsync().execute();
 
         onBackPressed();
@@ -55,19 +58,12 @@ public class DownloadActivity extends Activity {
                 Log.d("URL1",conection.getURL().toString());
                 conection.connect();
                 Log.d("URL2",conection.getURL().toString());
-
-                // this will be useful so that you can show a tipical 0-100% progress bar
-                int lenghtOfFile = conection.getContentLength();
-
-                // download the file
                 InputStream input = new BufferedInputStream(conection.getInputStream(), 8192);
                 retURL = conection.getURL().toString();
                 Log.d("URL3",conection.getURL().toString());
-                //Log.d("URL3",conection.getHeaderFields().get("Content-Location").get(0));
             }catch (Exception e){
                 retURL = conection.getURL().toString();
                 Log.d("URL4",conection.getURL().toString());
-                //Log.d("URL4",conection.getHeaderFields().get("Content-Location").get(0));
             }
             retURL = retURL.replaceAll("\\s","%20");
             Log.d("URL5",retURL);
